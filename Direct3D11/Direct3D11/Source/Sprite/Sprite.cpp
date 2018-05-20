@@ -18,7 +18,7 @@ Sprite::Sprite()
 	SecureZeroMemory(this, sizeof(this));
 	m_ActiveTextureIndex = { 0,0 };
 	m_Pos = { 0,0,1 };
-	m_DevNum = { 1,1 };
+	m_DivNum = { 1,1 };
 	m_Scale = { 1,1 ,1 };
 	m_Rot = {0,0,0};
 }
@@ -214,14 +214,14 @@ HRESULT Sprite::Initialize()
 	@brief	描画モードにアトラステクスチャを指定(テクスチャを分割)
 	@detail	横にx個、縦にy個になるようテクスチャを分割する
 */
-void Sprite::SetSplitTexture(DirectX::XMINT2 devNum)
+void Sprite::SetSplitTexture(DirectX::XMINT2 divNum)
 {
 #ifdef DEBUG_SPRITE
 	/*! エラー検知 */
 	try
 	{
-		if (devNum.x < 0) { throw "x=" + std::to_string(devNum.x); }
-		if (devNum.y < 0) { throw "y=" + std::to_string(devNum.y); }
+		if (divNum.x < 0) { throw "x=" + std::to_string(divNum.x); }
+		if (divNum.y < 0) { throw "y=" + std::to_string(divNum.y); }
 	}
 	catch (std::string xORy) 
 	{
@@ -230,26 +230,62 @@ void Sprite::SetSplitTexture(DirectX::XMINT2 devNum)
 	}
 #endif // DEBUG_SPRITE
 
-	m_DevNum = devNum;
+	m_DivNum = divNum;
 }
 
 /*!
 	@brief	描画モードがアトラステクスチャのものの描画インデックスを変更
-	@detail	インデックスの範囲{}
+	@detail	インデックスの範囲{0<=index.x<m_divNum.x,0<=index.y<m_divNum.y}
 */
 void Sprite::SetActivateIndex(DirectX::XMINT2 index)
 {
 #ifdef DEBUG_SPRITE
 	try
 	{
-		
+		if (index.x < 0) { throw -1;}
+		if (index.y < 0) { throw -1;}
+		if (m_DivNum.x <= index.x) { throw 0; }
+		if (m_DivNum.y <= index.y) { throw 0; }
 	}
-	catch (const std::exception&)
+	catch (int error_code)
 	{
 
+		std::string category;	/*!< カテゴリ */
+		std::string cause;		/*!< 原因 */
+		std::string input;		/*!< 入力値 */
+		std::string error;		/*!< ログに表示するエラー格納変数 */
+
+		switch (error_code)
+		{
+		case -1:
+		{
+			std::string detail;	/*!< 詳細 */
+			std::string range;	/*!< 範囲 */
+
+			category = "範囲外参照\n";
+			cause = "描画インデックスに対して無効な負の値が入力されました。\n";
+			detail = "インデックスに負の値を入力することは出来ません。\n";
+			range = "\n0<=x<" + std::to_string(m_DivNum.x) + " , 0<=y<" + std::to_string(m_DivNum.y) + "\n\n";
+			input = "入力値｛ " + std::to_string(index.x) + " , " + std::to_string(index.y) + " ｝";
+			error = category + cause + detail + range + input;
+		}
+		break;
+		case 0:
+		{
+			std::string division;	/*!< 分割数 */
+
+			category = "範囲外参照\n";
+			cause = "分割したサイズに対して分割サイズを超える無効な値が入力されました。\n";
+			division = "分割数｛ " + std::to_string(m_DivNum.x) + " , " + std::to_string(m_DivNum.y) + " ｝\n";
+			input = "入力値｛ " + std::to_string(index.x) + " , " + std::to_string(index.y) + " ｝";
+			error = category + cause + division + input;
+		}
+		break;
+		}
+		ErrorLog(error);
 	}
 #endif // DEBUG_SPRITE
-
+	m_ActiveTextureIndex = index;
 }
 
 
@@ -288,84 +324,6 @@ void Sprite::Release()
 	@brief	描画
 	@detail	スプライトの中心は中心座標
 */
-//void Sprite::Render() 
-//{
-//	/*! 頂点定義 */
-//	SpriteVertex vertices[] =
-//	{
-//		/*! 左下頂点 */
-//		{
-//			DirectX::XMFLOAT3(-0.5,-0.5,1),
-//			DirectX::XMFLOAT2(0,1)
-//		},
-//
-//		/*! 左上頂点 */
-//		{
-//			DirectX::XMFLOAT3(-0.5, 0.5,1),
-//			DirectX::XMFLOAT2(0,0)
-//		},
-//
-//		/*! 右下頂点 */
-//		{
-//			DirectX::XMFLOAT3(0.5,-0.5,1),
-//			DirectX::XMFLOAT2(1,1)
-//		},
-//
-//		/*! 右上頂点 */
-//		{
-//			DirectX::XMFLOAT3(0.5, 0.5,1),
-//			DirectX::XMFLOAT2(1,0)
-//		},
-//	};
-//
-//}
-
-//void Sprite::Render()
-//{
-//	DirectX::XMMATRIX mWorld;
-//	mWorld = DirectX::XMMatrixIdentity();
-//
-//	DirectX::XMMATRIX mView;
-//	DirectX::XMMATRIX mProj;
-//
-//	DirectX::XMMATRIX Tran;
-//	//mWorld = DirectX::XMMatrixTranslation(0, 0, 0);
-//	
-//	mView = Camera::GetViewMatrix();
-//	mProj = Camera::GetProjMatrix();
-//	DirectX::XMMATRIX m = mWorld*mView*mProj;
-//
-//	//使用するシェーダーのセット
-//	Direct3D11::GetDeviceContext()->VSSetShader(m_pVertexShader, NULL, 0);
-//	Direct3D11::GetDeviceContext()->PSSetShader(m_pPixelShader, NULL, 0);
-//	//シェーダーのコンスタントバッファーに各種データを渡す
-//	D3D11_MAPPED_SUBRESOURCE pData;
-//	SpriteShaderBuffer cb;
-//	if (SUCCEEDED(Direct3D11::GetDeviceContext()->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pData)))
-//	{
-//		//ワールド、カメラ、射影行列を渡す
-//		//cb.m_WorldMatrix = WVP;
-//		//D3DXMatrixTranspose(&cb.m_WorldMatrix, &cb.m_WorldMatrix);
-//		cb.m_WVP = DirectX::XMMatrixTranspose(m);
-//
-//		memcpy_s(pData.pData, pData.RowPitch, (void*)(&cb), sizeof(cb));
-//		Direct3D11::GetDeviceContext()->Unmap(m_pConstantBuffer, 0);
-//	}
-//	//このコンスタントバッファーをどのシェーダーで使うか
-//	Direct3D11::GetDeviceContext()->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
-//	Direct3D11::GetDeviceContext()->PSSetConstantBuffers(0, 1, &m_pConstantBuffer);
-//	//頂点インプットレイアウトをセット
-//	Direct3D11::GetDeviceContext()->IASetInputLayout(m_pVertexLayout);
-//	//プリミティブ・トポロジーをセット
-//	Direct3D11::GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-//	//テクスチャーをシェーダーに渡す
-//	Direct3D11::GetDeviceContext()->PSSetSamplers(0, 1, &m_pSampleLinear);
-//	Direct3D11::GetDeviceContext()->PSSetShaderResources(0, 1, &m_pTexture);
-//	//プリミティブをレンダリング
-//	Direct3D11::GetDeviceContext()->Draw(4, 0);
-//
-//}
-
 HRESULT Sprite::Render(Texture * texture, bool isReverse)
 {
 	/*! テクスチャデータの取得 */
@@ -382,14 +340,14 @@ HRESULT Sprite::Render(Texture * texture, bool isReverse)
 	//leftTop.x = -0.5f*size.x / large;
 	//leftTop.y = 0.5f*size.y / large;
 
-	leftTop.x = -0.5f*size.x / m_DevNum.x / large;
-	leftTop.y = 0.5f*size.y / m_DevNum.y / large;
+	leftTop.x = -0.5f*size.x / m_DivNum.x / large;
+	leftTop.y = 0.5f*size.y / m_DivNum.y / large;
 
 	//rightBottom.x = 0.5f*size.x / large;
 	//rightBottom.y = -0.5f*size.y / large;
 
-	rightBottom.x = 0.5f*size.x / m_DevNum.x / large;
-	rightBottom.y = -0.5f*size.y / m_DevNum.y / large;
+	rightBottom.x = 0.5f*size.x / m_DivNum.x / large;
+	rightBottom.y = -0.5f*size.y / m_DivNum.y / large;
 
 	/*! UV(テクスチャ)座標 */
 	DirectX::XMFLOAT2 uvLeftTop;
@@ -397,14 +355,14 @@ HRESULT Sprite::Render(Texture * texture, bool isReverse)
 
 	//uvLeftTop.x = 0;
 	//uvLeftTop.y = 0;
-	uvLeftTop.x = (float)m_ActiveTextureIndex.x / (float)m_DevNum.x;
-	uvLeftTop.y = (float)m_ActiveTextureIndex.y / (float)m_DevNum.y;
+	uvLeftTop.x = (float)m_ActiveTextureIndex.x / (float)m_DivNum.x;
+	uvLeftTop.y = (float)m_ActiveTextureIndex.y / (float)m_DivNum.y;
 
-	uvRightBottom.x = 1;
-	uvRightBottom.y = 1;
+	//uvRightBottom.x = 1;
+	//uvRightBottom.y = 1;
 
-	uvRightBottom.x = (float)(m_ActiveTextureIndex.x + 1) / (float)m_DevNum.x;
-	uvRightBottom.y = (float)(m_ActiveTextureIndex.y + 1) / (float)m_DevNum.y;
+	uvRightBottom.x = (float)(m_ActiveTextureIndex.x + 1) / (float)m_DivNum.x;
+	uvRightBottom.y = (float)(m_ActiveTextureIndex.y + 1) / (float)m_DivNum.y;
 
 	/****************************************/
 	/*				 ※注意					*/

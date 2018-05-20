@@ -44,7 +44,7 @@ public:
 
 	void SetPos(DirectX::XMFLOAT3 pos) { m_Pos.x = pos.x; m_Pos.y = pos.y;m_Pos.z = pos.z;}
 	void SetRot(DirectX::XMFLOAT3 rot) { m_Rot.x = rot.x, m_Rot.y = rot.y, m_Rot.z = rot.z; }
-	void SetSplitTexture(DirectX::XMINT2 devNum);/*!< テクスチャの分割 */
+	void SetSplitTexture(DirectX::XMINT2 divNum);/*!< テクスチャの分割 */
 	void SetActivateIndex(DirectX::XMINT2 index);
 private:
 	ID3D11InputLayout* m_pVertexLayout;
@@ -62,7 +62,7 @@ private:
 	DirectX::XMFLOAT3 m_Rot;
 	DirectX::XMFLOAT3 m_Scale;
 	DirectX::XMFLOAT3 m_Color;
-	DirectX::XMINT2 m_DevNum;				/*!< テクスチャの分割数 */
+	DirectX::XMINT2 m_DivNum;				/*!< テクスチャの分割数 */
 	DirectX::XMINT2 m_ActiveTextureIndex;	/*!< 使用するテクスチャのインデックス */
 	Mode m_eMode;
 

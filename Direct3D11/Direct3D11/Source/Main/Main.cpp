@@ -104,7 +104,7 @@ void Main::Loop()
 	HRESULT hr;
 
 	g_pSprite->Initialize();
-	//g_pSprite->SetSplitTexture();
+	g_pSprite->SetSplitTexture({3,5});
 	//DirectX::XMFLOAT3 i = { 100,100,0 };
 	//g_pSprite->SetRot(i);
 	//hr=g_pSprite->InitShader("SimpleTexture.hlsl");
@@ -188,6 +188,8 @@ void Main::App()
 */
 #include "../Input/Keyboard/Keyboard.h"
 DirectX::XMFLOAT3 pos = { 0,0,1 };
+int index = 0;
+int indey = 0;
 void Main::Update()
 {
 	Keyboard::Update();
@@ -197,7 +199,20 @@ void Main::Update()
 	else if (Keyboard::GetButton('W')) {
 		pos.y += 0.1f;
 	}
-	std::string str = std::to_string(pos.x) + std::to_string(pos.y) + std::to_string(pos.z);
+	else if (Keyboard::GetButtonDown('G')) {
+		index++;
+		//index=index==0?1:0;
+	}
+	else if (Keyboard::GetButtonDown('H')) {
+		indey++;
+		//indey = indey == 0 ? 1 : 0;
+	}
+
+	g_pSprite->SetActivateIndex({ index%3-4,indey%5 });
+
+	std::string str =
+		"x=" + std::to_string(index%3) + "," + "y=" + std::to_string(indey%5);
+		//std::to_string(pos.x) + std::to_string(pos.y) + std::to_string(pos.z);
 	SetWindowTextA(m_hWnd, str.c_str());
 	g_pSprite->SetPos(pos);
 
@@ -213,7 +228,7 @@ void Main::Render()
 
 	/*! シーンの描画 */
 //	g_pSprite->Render();
-	g_pSprite->Render(g_pTex,true);
+	g_pSprite->Render(g_pTex);
 
 	/*! 画面更新 */
 	Direct3D11::GetInstance().Present();
