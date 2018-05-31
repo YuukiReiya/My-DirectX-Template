@@ -26,6 +26,15 @@ const float Direct3D11::c_ClearColor[4]{ 0.5f,0.5f,1.5f,1.0f };		/*!< 描画ターゲ
 Direct3D11::Direct3D11()
 {
 	ZeroMemory(this, sizeof(Direct3D11));
+	m_pDevice=nullptr;
+	m_pDeviceContext = nullptr;
+	m_pSwapChain = nullptr;
+	m_pRenderTargetView = nullptr;
+	m_pDepthStencilView = nullptr;
+	m_pDepthStencil = nullptr;
+	m_pDepthStencilState = nullptr;
+	m_pBlendState = nullptr;
+	m_pRasterizerState = nullptr;
 }
 
 /*!
@@ -301,25 +310,25 @@ bool Direct3D11::Init(HWND hWnd)
 	bd.RenderTarget[0].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;	/*!< RGBAのうち書き込む値を指定する */
 
 	/*! ブレンドステート作成 */
-	hr = m_pDevice->CreateBlendState(
-		&bd,			/*!< ブレンドステート設定 */
-		&m_pBlendState	/*!< 設定を受け取る変数 */
-	);
-	if (FAILED(hr)) { 
-		ErrorLog("BlendState is not create!");
-		return false;
-	}/*!< ブレンドステート作成失敗 */
-	
-	/*! ブレンドステート設定用変数 */
-	float blendFactor[4]{ 0.0f,0.0f, 0.0f, 0.0f };
-	UINT mask=0xffffffff;
+	//hr = m_pDevice->CreateBlendState(
+	//	&bd,			/*!< ブレンドステート設定 */
+	//	&m_pBlendState	/*!< 設定を受け取る変数 */
+	//);
+	//if (FAILED(hr)) { 
+	//	ErrorLog("BlendState is not create!");
+	//	return false;
+	//}/*!< ブレンドステート作成失敗 */
+	//
+	///*! ブレンドステート設定用変数 */
+	//float blendFactor[4]{ 0.0f,0.0f, 0.0f, 0.0f };
+	//UINT mask=0xffffffff;
 
-	/*! OMにブレンドステートオブジェクト設定 */
-	m_pDeviceContext->OMSetBlendState(
-		m_pBlendState,		/*!< 設定するオブジェクト */
-		blendFactor,		/*!< 定数値 */
-		mask				/*!< サンプル用マスク */
-	);
+	///*! OMにブレンドステートオブジェクト設定 */
+	//m_pDeviceContext->OMSetBlendState(
+	//	m_pBlendState,		/*!< 設定するオブジェクト */
+	//	blendFactor,		/*!< 定数値 */
+	//	mask				/*!< サンプル用マスク */
+	//);
 
 	/*! 初期化終了 */
 	return true;

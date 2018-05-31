@@ -51,24 +51,45 @@ void Camera::Initialize(DirectX::XMFLOAT3 eyePt, DirectX::XMFLOAT3 lookPt, Direc
 {
 	/*! FLOAT3をVECTOR型に変換 */
 	{
-		GetInstance().m_EyePt		= DirectX::XMVectorSet(eyePt.x, eyePt.y, eyePt.z, 0.0f);
-		GetInstance().m_LookAtPt	= DirectX::XMVectorSet(lookPt.x, lookPt.y, lookPt.z, 0.0f);
-		GetInstance().m_UpVec		= DirectX::XMVectorSet(upVec.x, upVec.y, upVec.z, 0.0f);
+		m_EyePt		= DirectX::XMVectorSet(eyePt.x, eyePt.y, eyePt.z, 0.0f);
+		m_LookAtPt	= DirectX::XMVectorSet(lookPt.x, lookPt.y, lookPt.z, 0.0f);
+		m_UpVec		= DirectX::XMVectorSet(upVec.x, upVec.y, upVec.z, 0.0f);
 	}
 
 	/*! ビュー行列 */
-	GetInstance().m_ViewMat = DirectX::XMMatrixLookAtLH(
-		GetInstance().m_EyePt,								/*!< 視点位置 */
-		GetInstance().m_LookAtPt,							/*!< 注視点 */
-		GetInstance().m_UpVec								/*!< 上向き方向 */
+	m_ViewMat = DirectX::XMMatrixLookAtLH(
+		m_EyePt,							/*!< 視点位置 */
+		m_LookAtPt,							/*!< 注視点 */
+		m_UpVec								/*!< 上向き方向 */
 	);
 
 	/*! プロジェクション行列 */
-	GetInstance().m_ProjMat = DirectX::XMMatrixPerspectiveFovLH(
-		GetInstance().m_FieldOfView,													/*!< 視野角 */
-		static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT),			/*!< アスペクト比 */
-		GetInstance().m_NearClip,														/*!< クリッピング距離:近 */
-		GetInstance().m_FarClip															/*!< クリッピング距離:遠 */
+	m_ProjMat = DirectX::XMMatrixPerspectiveFovLH(
+		m_FieldOfView,															/*!< 視野角 */
+		static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT),	/*!< アスペクト比 */
+		m_NearClip,																/*!< クリッピング距離:近 */
+		m_FarClip																/*!< クリッピング距離:遠 */
 	);
 
 }
+
+/*!
+	@brief	カメラの視点を返す
+*/
+DirectX::XMFLOAT3 Camera::GetEyePt() const
+{
+	DirectX::XMFLOAT3 ret;
+	DirectX::XMStoreFloat3(&ret, m_EyePt);
+	return ret;
+}
+
+/*!
+	@brief	カメラの注視点を返す
+*/
+DirectX::XMFLOAT3 Camera::GetLookAtPt() const
+{
+	DirectX::XMFLOAT3 ret;
+	DirectX::XMStoreFloat3(&ret, m_LookAtPt);
+	return ret;
+}
+

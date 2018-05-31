@@ -17,7 +17,7 @@ public:
 
 
 	HRESULT Load(std::string filePath, DirectX::XMINT2 size);
-	void Destroy();
+	void Finalize();
 
 	void SetSize(DirectX::XMINT2 size) { m_Size = size; }
 	ID3D11SamplerState*GetSamplerState() { return m_pSamplerState; }

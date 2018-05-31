@@ -4,7 +4,7 @@
 	@author	番場 宥輝
 	@brief	シェーダー関連の構造体宣言
 */
-//#pragma once
+#pragma once
 //#pragma comment(lib,"d3dx10.lib")
 //#pragma comment(lib,"d3dCompiler.lib")
 ///*

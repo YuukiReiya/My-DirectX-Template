@@ -44,7 +44,6 @@ INT WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, INT)
 	if (g_pMain->Init(hInstance)) {
 		g_pMain->Loop();
 	}
-	
 
 	delete(g_pMain);
 

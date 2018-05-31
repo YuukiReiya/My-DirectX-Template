@@ -8,12 +8,29 @@
 #pragma once
 #include <DirectXMath.h>
 
+/****************************************/
+/*			カメラの描画域(v)			*/
+/*		NearClip <= v < FarClip			*/
+/*	Ex)									*/
+/*	NearClip = 0.1f, FarClip = 100.0f	*/
+/*	描画されるオブジェクトはカメラの視	*/
+/*	点+NearClipからカメラの視点+FarClip */
+/*	の範囲に収まっているものを描画する	*/
+/****************************************/
+#ifdef _DEBUG
+#define DEBUG_CAMERA
+#endif // _DEBUG
+
 class Camera
 {
 public:
 	~Camera();
+	static Camera& GetInstance() {
+		static Camera instance;
+		return instance;
+	}
 
-	static void Initialize(
+	void Initialize(
 		DirectX::XMFLOAT3 eyePt,	
 		DirectX::XMFLOAT3 lookPt	= {0.0f,0.0f,0.0f},
 		DirectX::XMFLOAT3 upVec		= c_UpVector
@@ -27,20 +44,18 @@ public:
 	static const DirectX::XMFLOAT3 c_UpVector;
 
 	/*! ゲッター */
-	static DirectX::XMMATRIX GetViewMatrix() { return GetInstance().m_ViewMat; }
-	static DirectX::XMMATRIX GetProjMatrix() { return GetInstance().m_ProjMat; }
-
+	DirectX::XMMATRIX GetViewMatrix()const { return GetInstance().m_ViewMat; }
+	DirectX::XMMATRIX GetProjMatrix()const { return GetInstance().m_ProjMat; }
+	DirectX::XMFLOAT3 GetEyePt()const;
+	DirectX::XMFLOAT3 GetLookAtPt()const;
 
 	/*! セッター */
-	static void SetFieldOfView(float fov)	{ GetInstance().m_FieldOfView = fov; }
-	static void SetNearClip(float nearClip) { GetInstance().m_NearClip	  = nearClip; }
-	static void SetFarClip(float farClip)	{ GetInstance().m_FarClip	  = farClip; }
+	void SetFieldOfView(float fov)	{ m_FieldOfView = fov; }
+	void SetNearClip(float nearClip) { m_NearClip	  = nearClip; }
+	void SetFarClip(float farClip)	{ m_FarClip	  = farClip; }
+
 private:
 	Camera();
-	static Camera& GetInstance() {
-		static Camera instance;
-		return instance;
-	}
 
 	/*! 変数 */
 	float m_FieldOfView;

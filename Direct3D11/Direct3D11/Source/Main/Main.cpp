@@ -10,6 +10,7 @@
 #include "../MyGame.h"
 #include "../Sprite/Sprite.h"
 #include "../MemoryLeaks.h"
+#include "../Shader/ShaderManager.h"
 #include "../Sound/SoundManager/SoundManager.h"
 #include "../Sound/Wave/Wave.h"
 
@@ -22,7 +23,6 @@ const float Main::c_MinFrameTime	= 1.0f / Main::c_FPS;			/*!< 1ƒtƒŒ[ƒ€•Ó‚è‚ÌŒo‰
 
 #include "../Camera/Camera.h"
 Texture* g_pTex;
-//Wave* wave;
 Sprite* g_pSprite;
 
 /*!
@@ -38,13 +38,14 @@ Main::Main() :m_pWindow(nullptr)
 Main::~Main()
 {
 	//delete(wave);
-	SAFE_DELETE(m_pWindow);
 	Release();
+	//SAFE_DELETE(m_pWindow);
 }
 
 /*!
 	@brief	‰Šú‰»
 */
+
 bool Main::Init(HINSTANCE hInstance)
 {
 	m_pWindow = new Window;
@@ -59,8 +60,12 @@ bool Main::Init(HINSTANCE hInstance)
 	}
 
 	/*! ƒfƒoƒCƒX‰Šú‰» */
-	if (!Direct3D11::GetInstance().Init(m_hWnd))	{ return false; }		/*!< ƒfƒoƒCƒX */
-	if (FAILED(SoundManager::GetInstance().Init())) { return false; }		/*!< ƒTƒEƒ“ƒh */
+	auto device = &Direct3D11::GetInstance();
+	auto sound = &SoundManager::GetInstance();
+	auto shader = &ShaderManager::GetInstance();
+	if (!device->Init(m_hWnd)) { return false; }		/*!< ƒfƒoƒCƒX */
+	if (FAILED(sound->Init())) { return false; }		/*!< ƒTƒEƒ“ƒh */
+	if (FAILED(shader->Initialize())) { return false; }
 
 	return true;
 }
@@ -70,41 +75,49 @@ bool Main::Init(HINSTANCE hInstance)
 */
 void Main::Release()
 {
-	//SAFE_DELETE(g_pSprite);
-	SAFE_DELETE(m_pWindow);
-	SoundManager::GetInstance().Release();
-	Direct3D11::GetInstance().Release();
 	SAFE_DELETE(g_pTex);
 	SAFE_DELETE(g_pSprite);
+	SAFE_DELETE(m_pWindow);
+	SoundManager::GetInstance().Release();
+	ShaderManager::GetInstance().Finalize();
+	Direct3D11::GetInstance().Release();
 }
 
 /*!	
 	@brief	ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ˆ—‚Ì“ü‚èŒû
 */
+#include "../Input/Keyboard/Keyboard.h"
 void Main::Loop()
 {
 	/*! FPS‚Ì‰Šú‰» */
 	SetUpFPS();
 
 	/*! ƒJƒƒ‰‚Ì‰Šú‰» */
-	Camera::Initialize({ 0,0,-1 });
+	Camera::GetInstance().Initialize({ 0,0,-1 });
 
 	/*! ƒV[ƒ“‚Ì‰Šú‰» */
 	g_pTex = new Texture;
-	//g_pTex->Load("image.jpeg", {308,163});
-	//g_pTex->Load("yukina.jpg", { 648,960 });
-	g_pTex->Load("Resource/Texture/–‚‰¤.png", { 96,160 });
-	//g_pTex->Load("Input.png", { 2048,256 });
-	//g_pTex->Load("sprite.jpg", { 256,256 });
+	//g_pTex->Load("Resource/Texture/sprite.jpg", {308,163});
+	g_pTex->Load("Resource/Texture/yukina.jpg", { 648,960 });
+	//g_pTex->Load("Resource/Texture/–‚‰¤.png", { 96,160 });
+
 
 	//wave = new Wave;
 	//wave->Load("Resource/Sound/titleBGM.wav");
 	////wave->Play();
-	g_pSprite = new Sprite;
 	HRESULT hr;
 
-	g_pSprite->Initialize();
-	g_pSprite->SetSplitTexture({3,5});
+	g_pSprite = new Sprite;
+	hr = g_pSprite->Initialize();
+	if (FAILED(hr)) { ErrorLog(""); }
+	g_pSprite->SetPos({ 0,0,98.9f });
+
+	//auto a = Camera::GetInstance();
+	//std::string e = "x=" + std::to_string(a.GetEyePt().x) + ",y=" + std::to_string(a.GetEyePt().y) + ",z=" + std::to_string(a.GetEyePt().z);
+
+	//ErrorLog(e);
+
+	//g_pSprite->SetSplitTexture({3,5});
 	//DirectX::XMFLOAT3 i = { 100,100,0 };
 	//g_pSprite->SetRot(i);
 	//hr=g_pSprite->InitShader("SimpleTexture.hlsl");
@@ -127,6 +140,7 @@ void Main::Loop()
 			App();/*!< Appˆ— */
 		}
 	}
+
 }
 
 /*
@@ -186,35 +200,43 @@ void Main::App()
 /*!
 	@brief	XV
 */
-#include "../Input/Keyboard/Keyboard.h"
-DirectX::XMFLOAT3 pos = { 0,0,1 };
-int index = 0;
-int indey = 0;
+float x = 0;
 void Main::Update()
 {
 	Keyboard::Update();
-	if (Keyboard::GetButton('S')) {
-		pos.y -= 0.1f;
-	}
-	else if (Keyboard::GetButton('W')) {
-		pos.y += 0.1f;
-	}
-	else if (Keyboard::GetButtonDown('G')) {
-		index++;
-		//index=index==0?1:0;
-	}
-	else if (Keyboard::GetButtonDown('H')) {
-		indey++;
-		//indey = indey == 0 ? 1 : 0;
+
+	if ((Keyboard::GetButton(Keyboard::UP))) {
+		x += 0.001f;
+		g_pSprite->SetPos({ x,0,g_pSprite->GetPos().z });
 	}
 
-	g_pSprite->SetActivateIndex({ index%3-4,indey%5 });
+	if (Keyboard::GetButton(Keyboard::DOWN)) {
 
-	std::string str =
-		"x=" + std::to_string(index%3) + "," + "y=" + std::to_string(indey%5);
-		//std::to_string(pos.x) + std::to_string(pos.y) + std::to_string(pos.z);
-	SetWindowTextA(m_hWnd, str.c_str());
-	g_pSprite->SetPos(pos);
+		g_pSprite->SetPos({ x,0,g_pSprite->GetPos().z });
+	}
+
+	if (Keyboard::GetButton(Keyboard::LEFT)) {
+		x -= 0.001f;
+		g_pSprite->SetPos({ x,0,g_pSprite->GetPos().z });
+	}
+
+	if (Keyboard::GetButton(Keyboard::RIGHT)) {
+		x += 0.001f;
+		g_pSprite->SetPos({ x,0,g_pSprite->GetPos().z });
+
+	}
+
+	//static float cx = 0;
+	//if (Keyboard::GetButton('A')) {
+	//	cx -= 0.1f;
+	//	Camera::GetInstance().Initialize({ x,0,-1 });
+	//}
+
+	//if (Keyboard::GetButton('D')) {
+	//	cx += 0.1f;
+	//	Camera::GetInstance().Initialize({ x,0,-1 });
+	//}
+	//g_pSprite->SetPos(pos);
 
 }
 
@@ -227,7 +249,6 @@ void Main::Render()
 	Direct3D11::GetInstance().Clear();
 
 	/*! ƒV[ƒ“‚Ì•`‰æ */
-//	g_pSprite->Render();
 	g_pSprite->Render(g_pTex);
 
 	/*! ‰æ–ÊXV */

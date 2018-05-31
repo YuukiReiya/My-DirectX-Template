@@ -86,10 +86,15 @@ static inline void SAFE_DELETE(T* &p)
 	typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
 	(void)sizeof(type_must_be_complete);
 
-	if (p != nullptr) {
+	//if (p != nullptr) {
+	//	delete(p);
+	//	p = nullptr;
+	//}
+	if (p != NULL) {
 		delete(p);
-		p = nullptr;
+		p = NULL;
 	}
+
 }
 
 /*

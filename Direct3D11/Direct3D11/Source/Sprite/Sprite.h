@@ -9,6 +9,7 @@
 #include <string>
 #include <D3D11.h>
 #include "../Shader/StructShaderBase.h"
+#include "../Shader/ShaderManager.h"
 #include <DirectXMath.h>
 
 #include "../Texture/Texture.h"
@@ -23,7 +24,7 @@
 class Sprite
 {
 public:
-	explicit Sprite();
+	Sprite();
 	~Sprite();
 
 	/*! 描画モード */
@@ -34,28 +35,27 @@ public:
 
 
 	HRESULT Initialize();
-	//HRESULT InitPolygon();
-	//HRESULT InitShader(std::string hlslPath);
 	void Release();
 
-	void Render();
 	HRESULT Render(Texture*texture, bool isReverse = false);
 	//void RenderSprite(DirectX::XMMATRIX WVP);
 
-	void SetPos(DirectX::XMFLOAT3 pos) { m_Pos.x = pos.x; m_Pos.y = pos.y;m_Pos.z = pos.z;}
+	DirectX::XMFLOAT3 GetPos()const { return m_Pos; }
+	void SetPos(DirectX::XMFLOAT3 pos);//{ m_Pos.x = pos.x; m_Pos.y = pos.y;m_Pos.z = pos.z;}
+	void SetPos(DirectX::XMFLOAT2 pos);
 	void SetRot(DirectX::XMFLOAT3 rot) { m_Rot.x = rot.x, m_Rot.y = rot.y, m_Rot.z = rot.z; }
 	void SetSplitTexture(DirectX::XMINT2 divNum);/*!< テクスチャの分割 */
-	void SetActivateIndex(DirectX::XMINT2 index);
+	void SetActivateIndex(DirectX::XMINT2 index);/*!< 使用する描画するテクスチャを変更 */
 private:
-	ID3D11InputLayout* m_pVertexLayout;
-	ID3D11VertexShader* m_pVertexShader;
-	ID3D11PixelShader* m_pPixelShader;
-	ID3D11Buffer* m_pConstantBuffer;
+
+	static constexpr int c_VertexCount = 4;/*!< スプライトの頂点数 */
+	static const float c_VertexZ;
+	HRESULT CreateVertex();
 
 	//スプライト毎
+	std::string m_szShaderDataUsage;
 	ID3D11Buffer* m_pVertexBuffer;
-	ID3D11SamplerState*m_pSampleLinear;
-	ID3D11ShaderResourceView* m_pTexture;
+	ID3D11BlendState* m_pBlendState;
 
 	//
 	DirectX::XMFLOAT3 m_Pos;
@@ -65,35 +65,33 @@ private:
 	DirectX::XMINT2 m_DivNum;				/*!< テクスチャの分割数 */
 	DirectX::XMINT2 m_ActiveTextureIndex;	/*!< 使用するテクスチャのインデックス */
 	Mode m_eMode;
-
 	float m_Alpha;
-	ID3D11BlendState* m_pBlendState;
 
 
+};
 
-	/****************************************/
-	/*		スプライトで扱う構造体			*/
-	/****************************************/
+/****************************************/
+/*		スプライトで扱う構造体			*/
+/****************************************/
 
-	/*!
-		@brief	スプライトの頂点構造体
-	*/
-	struct SpriteVertex
-		:public VARTEX_BASE
-	{
-		SpriteVertex(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 uv) {
-			m_Pos = pos, m_UV = uv;
-		}
-		DirectX::XMFLOAT2 m_UV;
-	};
+/*!
+	@brief	スプライトの頂点構造体
+*/
+struct SpriteVertex
+	:public VARTEX_BASE
+{
+	SpriteVertex(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT2 uv) {
+		m_Pos = pos, m_UV = uv;
+	}
+	DirectX::XMFLOAT2 m_UV;
+};
 
-	/*!
-		@brief	スプライトのコンスタントバッファ構造体
-	*/
-	struct SpriteShaderBuffer
-		:CONSTANT_BUFFER_BASE
-	{
-		ALIGN16<DirectX::XMFLOAT3>	m_Color;
-		ALIGN16<float>				m_Alpha;
-	};
+/*!
+	@brief	スプライトのコンスタントバッファ構造体
+*/
+struct SpriteShaderBuffer
+	:CONSTANT_BUFFER_BASE
+{
+	ALIGN16<DirectX::XMFLOAT3>	m_Color;
+	ALIGN16<float>				m_Alpha;
 };

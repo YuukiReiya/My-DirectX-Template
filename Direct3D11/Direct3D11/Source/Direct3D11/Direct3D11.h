@@ -22,17 +22,17 @@
 /*!
 	@def	íËêîêÈåæ
 */
-const INT WINDOW_WIDTH	= 1920;
-const INT WINDOW_HEIGHT = 1080;
+const INT WINDOW_WIDTH	= 1600;
+const INT WINDOW_HEIGHT = 900;
 
 /*!
 	@brief	COMÇÃâï˙
 */
 template<class COM>
 static inline void COM_RELEASE(COM* &com) {
-	if (com != nullptr) {
+	if (com != NULL) {
 		com->Release();
-		com = nullptr;
+		com = NULL;
 	}
 }
 
@@ -53,10 +53,14 @@ public:
 	void Clear();
 	void Present();
 
-	static ID3D11Device* GetDevice() { return GetInstance().m_pDevice; }
-	static ID3D11DeviceContext* GetDeviceContext() { return GetInstance().m_pDeviceContext; }
+	ID3D11Device* GetDevice() { return m_pDevice; }
+	ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext; }
+
+	
 private:
 	Direct3D11();
+	void operator=(const Direct3D11& instance)	= delete;	/*!< ë„ì¸ã÷é~ */
+	Direct3D11(const Direct3D11& instance)		= delete;	/*!< ÉRÉsÅ[ã÷é~ */
 
 	static const float c_ClearColor[4];
 
@@ -69,7 +73,5 @@ private:
 	ID3D11DepthStencilState*	m_pDepthStencilState;
 	ID3D11BlendState*			m_pBlendState;
 	ID3D11RasterizerState*		m_pRasterizerState;
-
-	
 };
 
