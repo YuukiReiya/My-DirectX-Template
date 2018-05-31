@@ -38,13 +38,13 @@ static inline std::basic_string<TCHAR> tString(std::string str) {
 /*!
 	@brief	メッセージボックスのエラー表示
 */
-static inline void ErrorLog(std::string msg) {
+static inline int ErrorLog(std::string msg) {
 #ifdef _UNICODE
 	
 	size_t length =0;
 	WCHAR tmp[MAX_PATH] = { 0 };
 	mbstowcs_s(&length, tmp, MAX_PATH, msg.c_str(), _TRUNCATE);
-	MessageBoxW(NULL, tmp, _T("Error"), MB_OK);
+	return MessageBoxW(NULL, tmp, _T("Error"), MB_OK);
 #else
 	MessageBoxA(NULL, msg.c_str(), _T("Error"), MB_OK);
 #endif // _UNICODE

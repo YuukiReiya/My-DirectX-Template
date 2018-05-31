@@ -37,22 +37,22 @@ public:
 	);
 
 	/*! 定数 */
-	static const double c_Pi;
-	static const float c_FieldOfView;
-	static const float c_NearClip;
-	static const float c_FarClip;
-	static const DirectX::XMFLOAT3 c_UpVector;
+	static const double		c_Pi;				/*!< 円周率π */
+	static const float		c_FieldOfView;		/*!< 画角 */
+	static const float		c_NearClip;			/*!< デフォルトクリッピング距離:近 */
+	static const float		c_FarClip;			/*!< デフォルトクリッピング距離:遠 */
+	static const DirectX::XMFLOAT3 c_UpVector;	/*!< デフォルトの上向きベクトル */
 
 	/*! ゲッター */
-	DirectX::XMMATRIX GetViewMatrix()const { return GetInstance().m_ViewMat; }
-	DirectX::XMMATRIX GetProjMatrix()const { return GetInstance().m_ProjMat; }
+	DirectX::XMMATRIX GetViewMatrix()const { return m_ViewMat; }
+	DirectX::XMMATRIX GetProjMatrix()const { return m_ProjMat; }
 	DirectX::XMFLOAT3 GetEyePt()const;
 	DirectX::XMFLOAT3 GetLookAtPt()const;
 
 	/*! セッター */
 	void SetFieldOfView(float fov)	{ m_FieldOfView = fov; }
-	void SetNearClip(float nearClip) { m_NearClip	  = nearClip; }
-	void SetFarClip(float farClip)	{ m_FarClip	  = farClip; }
+	void SetNearClip(float nearClip){ m_NearClip	= nearClip; }
+	void SetFarClip(float farClip)	{ m_FarClip		= farClip; }
 
 private:
 	Camera();

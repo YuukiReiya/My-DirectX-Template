@@ -110,7 +110,7 @@ void Main::Loop()
 	g_pSprite = new Sprite;
 	hr = g_pSprite->Initialize();
 	if (FAILED(hr)) { ErrorLog(""); }
-	g_pSprite->SetPos({ 0,0,98.9f });
+	g_pSprite->SetPos({ 0,0,1 });
 
 	//auto a = Camera::GetInstance();
 	//std::string e = "x=" + std::to_string(a.GetEyePt().x) + ",y=" + std::to_string(a.GetEyePt().y) + ",z=" + std::to_string(a.GetEyePt().z);

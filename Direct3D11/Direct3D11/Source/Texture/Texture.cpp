@@ -6,8 +6,10 @@
 Texture::Texture()
 {
 	SecureZeroMemory(this, sizeof(this));
-	m_pSamplerState		= nullptr;
-	m_pResorceTexture	= nullptr;
+	m_pSamplerState		= NULL;
+	m_pResorceTexture	= NULL;
+	m_eTileMode = TileMode::Clamp;
+	m_eFilteringMode = FilteringMode::Trilinear;
 }
 
 
@@ -84,4 +86,16 @@ void Texture::Finalize()
 		m_pResorceTexture->Release();
 		m_pResorceTexture = NULL;
 	}
+}
+
+/*!
+	@brief	タイリングモードの設定
+	@detail	サンプラーステートの再作成
+*/
+HRESULT Texture::SetTileMode(TileMode tile, FilteringMode filter)
+{
+	D3D11_SAMPLER_DESC sd;
+	SecureZeroMemory(&sd, sizeof(sd));
+	sd.Filter = static_cast<D3D11_FILTER>(filter);
+
 }

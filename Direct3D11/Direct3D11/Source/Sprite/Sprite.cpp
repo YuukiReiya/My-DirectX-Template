@@ -160,12 +160,12 @@ void Sprite::Release()
 	@brief	描画
 	@detail	スプライトの中心は中心座標
 */
-HRESULT Sprite::Render(Texture * texture, bool isReverse)
+HRESULT Sprite::Render(Texture * pTexture, bool isReverse)
 {
 	/*! テクスチャデータの取得 */
-	auto& size = texture->GetSize();		/*!< テクスチャサイズ */
-	auto pSampler = texture->GetSamplerState();
-	auto pTex = texture->GetTexture();	/*!< テクスチャデータ */
+	auto& size = pTexture->GetSize();		/*!< テクスチャサイズ */
+	auto pSampler = pTexture->GetSamplerState();
+	auto pTex = pTexture->GetTexture();	/*!< テクスチャデータ */
 
 	auto large = size.x < size.y ? size.y : size.x;
 
@@ -207,85 +207,85 @@ HRESULT Sprite::Render(Texture * texture, bool isReverse)
 
 
 	/*! 頂点定義 */
-	SpriteVertex vertices[] =
-	{
-		/*! 右上頂点 */
-		{
-			DirectX::XMFLOAT3(
-				rightBottom.x,
-				leftTop.y,
-				c_VertexZ
-			),
-			DirectX::XMFLOAT2(
-				uvRightBottom.x,
-				uvLeftTop.y
-			),
-		},
-		/*! 右下頂点 */
-		{
-			DirectX::XMFLOAT3(
-				rightBottom.x,
-				rightBottom.y,
-				c_VertexZ
-			),
-			DirectX::XMFLOAT2(
-				uvRightBottom.x,
-				uvRightBottom.y
-			),
-		},
-		/*! 左上頂点 */
-		{
-			DirectX::XMFLOAT3(
-				leftTop.x,
-				leftTop.y,
-				c_VertexZ
-			),
-			DirectX::XMFLOAT2(
-				uvLeftTop.x,
-				uvLeftTop.y
-			),
-		},
-		/*! 左下頂点 */
-		{
-			DirectX::XMFLOAT3(
-				leftTop.x,
-				rightBottom.y,
-				c_VertexZ
-			),
-			DirectX::XMFLOAT2(
-				uvLeftTop.x,
-				uvRightBottom.y
-			),
-		},
-	};
+	//SpriteVertex vertices[] =
+	//{
+	//	/*! 右上頂点 */
+	//	{
+	//		DirectX::XMFLOAT3(
+	//			rightBottom.x,
+	//			leftTop.y,
+	//			c_VertexZ
+	//		),
+	//		DirectX::XMFLOAT2(
+	//			uvRightBottom.x,
+	//			uvLeftTop.y
+	//		),
+	//	},
+	//	/*! 右下頂点 */
+	//	{
+	//		DirectX::XMFLOAT3(
+	//			rightBottom.x,
+	//			rightBottom.y,
+	//			c_VertexZ
+	//		),
+	//		DirectX::XMFLOAT2(
+	//			uvRightBottom.x,
+	//			uvRightBottom.y
+	//		),
+	//	},
+	//	/*! 左上頂点 */
+	//	{
+	//		DirectX::XMFLOAT3(
+	//			leftTop.x,
+	//			leftTop.y,
+	//			c_VertexZ
+	//		),
+	//		DirectX::XMFLOAT2(
+	//			uvLeftTop.x,
+	//			uvLeftTop.y
+	//		),
+	//	},
+	//	/*! 左下頂点 */
+	//	{
+	//		DirectX::XMFLOAT3(
+	//			leftTop.x,
+	//			rightBottom.y,
+	//			c_VertexZ
+	//		),
+	//		DirectX::XMFLOAT2(
+	//			uvLeftTop.x,
+	//			uvRightBottom.y
+	//		),
+	//	},
+	//};
 
-	/*! 板ポリゴン(四角形ポリゴン)のバッファを定義 */
-	D3D11_BUFFER_DESC bd;
-	SecureZeroMemory(&bd, sizeof(bd));
-	bd.Usage = D3D11_USAGE_DEFAULT;				/*!< GPUから読み込みと書き込みを許可 */
-	bd.ByteWidth = sizeof(vertices);			/*!< バッファのサイズ */
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;	/*!< 頂点バッファとしてレンダリングパイプラインにバインド */
+	///*! 板ポリゴン(四角形ポリゴン)のバッファを定義 */
+	//D3D11_BUFFER_DESC bd;
+	//SecureZeroMemory(&bd, sizeof(bd));
+	//bd.Usage = D3D11_USAGE_DEFAULT;				/*!< GPUから読み込みと書き込みを許可 */
+	//bd.ByteWidth = sizeof(vertices);			/*!< バッファのサイズ */
+	//bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;	/*!< 頂点バッファとしてレンダリングパイプラインにバインド */
 
-	/*! サブリソースのデータを定義 */
-	D3D11_SUBRESOURCE_DATA subResourceData;
-	SecureZeroMemory(&subResourceData, sizeof(subResourceData));
-	subResourceData.pSysMem = vertices;			/*!< 初期化データへのポインタ */
+	///*! サブリソースのデータを定義 */
+	//D3D11_SUBRESOURCE_DATA subResourceData;
+	//SecureZeroMemory(&subResourceData, sizeof(subResourceData));
+	//subResourceData.pSysMem = vertices;			/*!< 初期化データへのポインタ */
 
 	HRESULT hr;
-	//hr = CreateVertex();
-	//if (FAILED(hr)) { ErrorLog("残念でした"); }
+	hr = CreateVertex(pTexture);
+	if (FAILED(hr)) { ErrorLog("残念でした"); }
 
 	/*! 頂点バッファ生成 */
-	hr = Direct3D11::GetInstance().GetDevice()->CreateBuffer(
-		&bd,
-		&subResourceData,
-		&m_pVertexBuffer
-	);
-	if (FAILED(hr)) {
-		std::string error = "SpriteBuffer is not Create!";
-		ErrorLog(error);
-		return E_FAIL;
-	}
+	//hr = Direct3D11::GetInstance().GetDevice()->CreateBuffer(
+	//	&bd,
+	//	&subResourceData,
+	//	&m_pVertexBuffer
+	//);
+	//if (FAILED(hr)) {
+	//	std::string error = "SpriteBuffer is not Create!";
+	//	ErrorLog(error);
+	//	return E_FAIL;
+	//}
 
 	/*! トポロジーセット */
 	Direct3D11::GetInstance().GetDeviceContext()->IASetPrimitiveTopology(
@@ -398,10 +398,27 @@ HRESULT Sprite::Render(Texture * texture, bool isReverse)
 	return S_OK;
 }
 
-HRESULT Sprite::CreateVertex()
+HRESULT Sprite::CreateVertex(Texture* pTexture)
 {
-	DirectX::XMFLOAT2 leftTop, rightBottom;
+	/*! 頂点定義 */
+	DirectX::XMFLOAT2 leftTop, rightBottom;			/*!< 頂点座標 */
+	DirectX::XMFLOAT2 uvLeftTop, uvRightBottom;		/*!< UV座標 */
 
+	auto size = pTexture->GetSize();
+	float larger = size.x <= size.y ? size.y : size.x;
+
+	leftTop.y = rightBottom.x = 0.5f;
+	leftTop.x = rightBottom.y = -0.5f;
+
+	leftTop.x = -0.5f*size.x / larger;
+	rightBottom.x = 0.5f*size.x / larger;
+	leftTop.y = 0.5f*size.y / larger;
+	rightBottom.y = -0.5f*size.y / larger;
+
+	uvLeftTop.x = uvLeftTop.y = 0;
+	uvRightBottom.x = uvRightBottom.y = 1;
+
+	/*! 頂点構造体定義 */
 	SpriteVertex vertices[] = {
 		/*! 右上 */
 		{
@@ -409,57 +426,57 @@ HRESULT Sprite::CreateVertex()
 			DirectX::XMFLOAT3(
 				rightBottom.x,
 				leftTop.y,
-				m_Pos.z
+				c_VertexZ
 			),
-			/*! UV座標 */
-			DirectX::XMFLOAT2(
-				1,
-				0
-			),
-		},
+		/*! UV座標 */
+		DirectX::XMFLOAT2(
+			uvRightBottom.x,
+			uvLeftTop.y
+		),
+	},
 		/*! 右下 */
 		{
-			/*! 頂点 */
-			DirectX::XMFLOAT3(
-				rightBottom.x,
-				rightBottom.y,
-				m_Pos.z
-			),
-			/*! UV座標 */
-			DirectX::XMFLOAT2(
-				1,
-				1
-			),
-		},
+		/*! 頂点 */
+		DirectX::XMFLOAT3(
+			rightBottom.x,
+			rightBottom.y,
+			c_VertexZ
+		),
+		/*! UV座標 */
+		DirectX::XMFLOAT2(
+			uvRightBottom.x,
+			uvRightBottom.y
+		),
+	},
 		/*! 左上 */
 		{
-			/*! 頂点 */
-			DirectX::XMFLOAT3(
-				leftTop.x,
-				leftTop.y,
-				m_Pos.z
-			),
-			/*! UV座標 */
-			DirectX::XMFLOAT2(
-				0,
-				0
-			),
-		},
+		/*! 頂点 */
+		DirectX::XMFLOAT3(
+			leftTop.x,
+			leftTop.y,
+			c_VertexZ
+		),
+		/*! UV座標 */
+		DirectX::XMFLOAT2(
+			uvLeftTop.x,
+			uvLeftTop.y
+		),
+	},
 		/*! 左下 */
 		{
-			/*! 頂点 */
-			DirectX::XMFLOAT3(
-				leftTop.x,
-				rightBottom.y,
-				m_Pos.z
-			),
-			/*! UV座標 */
-			DirectX::XMFLOAT2(
-				0,
-				1
-			),
+		/*! 頂点 */
+		DirectX::XMFLOAT3(
+			leftTop.x,
+			rightBottom.y,
+			c_VertexZ
+		),
+		/*! UV座標 */
+		DirectX::XMFLOAT2(
+			uvLeftTop.x,
+			uvRightBottom.y
+		),
 
-		}
+	}
 	};
 
 	/*! 板ポリゴン(四角形ポリゴン)のバッファを定義 */
@@ -490,27 +507,51 @@ HRESULT Sprite::CreateVertex()
 	return S_OK;
 }
 
+/*!
+	@brief	座標のセッター
+*/
 void Sprite::SetPos(DirectX::XMFLOAT3 pos)
 {
 #ifdef DEBUG_SPRITE
+	/*! クリップ距離(z)が描画範囲外なら警告 */
+	float nearClip = Camera::GetInstance().GetEyePt().z + Camera::c_NearClip;
+	float farClip = Camera::GetInstance().GetEyePt().z + Camera::c_FarClip;
 
-	float clip = Camera::GetInstance().GetEyePt().z;
+	try
+	{
+		std::string error = "スプライトはカメラのクリップの描画範囲外のため描画されません。\n";
+		if (pos.z < nearClip) {
 
+			error += "\nNearClip > Pos.z\n";
+			error += std::to_string(nearClip) + " > " + std::to_string(pos.z);
+			error += "\n\nスプライトはカメラより手前にあります";
+			throw error;
+		}
+		if (pos.z >= farClip) {
 
-	//pos.z<clip
+			error += "\nFarClip <= Pos.z\n";
+			error += std::to_string(farClip) + " <= " + std::to_string(pos.z);
+			error += "\n\nスプライトはカメラの描画範囲より奥にあります";
+			throw error;
+		}
+	}
+	catch (std::string error)
+	{
+		int ret = ErrorLog(error);
+		if (ret == IDOK) {
+			exit(NULL);
+		}
+	}
+
+	
 #endif // DEBUG_SPRITE
-
 	m_Pos = pos;
-
-	//auto a = Camera::GetInstance();
-	//std::string e = "x=" + std::to_string(a.GetEyePt().x) + ",y=" + std::to_string(a.GetEyePt().y) + ",z=" + std::to_string(a.GetEyePt().z)+"\n"+
-	//	"x=" + std::to_string(m_Pos.x) + ",y=" + std::to_string(m_Pos.y) + ",z=" + std::to_string(m_Pos.z);
-
-	//ErrorLog(e);
-
-	//DirectX::XMFLOAT3 
 }
 
+/*!
+	@brief	座標のセッター
+	@detail	オーバーロード
+*/
 void Sprite::SetPos(DirectX::XMFLOAT2 pos)
 {
 	m_Pos = { pos.x,pos.y,m_Pos.z };

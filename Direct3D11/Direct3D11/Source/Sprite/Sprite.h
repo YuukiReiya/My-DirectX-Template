@@ -37,8 +37,7 @@ public:
 	HRESULT Initialize();
 	void Release();
 
-	HRESULT Render(Texture*texture, bool isReverse = false);
-	//void RenderSprite(DirectX::XMMATRIX WVP);
+	HRESULT Render(Texture* pTexture, bool isReverse = false);
 
 	DirectX::XMFLOAT3 GetPos()const { return m_Pos; }
 	void SetPos(DirectX::XMFLOAT3 pos);//{ m_Pos.x = pos.x; m_Pos.y = pos.y;m_Pos.z = pos.z;}
@@ -50,18 +49,25 @@ private:
 
 	static constexpr int c_VertexCount = 4;/*!< スプライトの頂点数 */
 	static const float c_VertexZ;
-	HRESULT CreateVertex();
+	HRESULT CreateVertex(Texture* pTexture);
 
 	//スプライト毎
 	std::string m_szShaderDataUsage;
 	ID3D11Buffer* m_pVertexBuffer;
 	ID3D11BlendState* m_pBlendState;
 
-	//
+	/****************************************/
+	/*		　スプライトのパラメータ		*/
+	/****************************************/
+
+
+	/*! ローカル座標系 */
 	DirectX::XMFLOAT3 m_Pos;
 	DirectX::XMFLOAT3 m_Rot;
 	DirectX::XMFLOAT3 m_Scale;
 	DirectX::XMFLOAT3 m_Color;
+
+	/*! スプライトの */
 	DirectX::XMINT2 m_DivNum;				/*!< テクスチャの分割数 */
 	DirectX::XMINT2 m_ActiveTextureIndex;	/*!< 使用するテクスチャのインデックス */
 	Mode m_eMode;

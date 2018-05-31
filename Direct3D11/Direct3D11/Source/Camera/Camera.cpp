@@ -78,6 +78,7 @@ void Camera::Initialize(DirectX::XMFLOAT3 eyePt, DirectX::XMFLOAT3 lookPt, Direc
 */
 DirectX::XMFLOAT3 Camera::GetEyePt() const
 {
+	/*! VECTORŒ^‚ðFLOAT3‚É•ÏŠ· */
 	DirectX::XMFLOAT3 ret;
 	DirectX::XMStoreFloat3(&ret, m_EyePt);
 	return ret;
@@ -88,6 +89,7 @@ DirectX::XMFLOAT3 Camera::GetEyePt() const
 */
 DirectX::XMFLOAT3 Camera::GetLookAtPt() const
 {
+	/*! VECTORŒ^‚ðFLOAT3‚É•ÏŠ· */
 	DirectX::XMFLOAT3 ret;
 	DirectX::XMStoreFloat3(&ret, m_LookAtPt);
 	return ret;
